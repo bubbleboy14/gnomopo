@@ -3,6 +3,10 @@
   "description": "Exposes mouse position",
   "uuid": "gnomopo@mkult.co",
   "shell-version": [
-    "46"
+    "45",
+    "46",
+    "47",
+    "48",
+    "49"
   ]
 }

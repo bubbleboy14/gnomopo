@@ -27,5 +27,4 @@ x, y = gnomopo.getpos()
 ```
 
 ## todo
- - more shell versions
- - alt transports > dbus ; AF_UNIX sockets
+The shell extension currently listens on a port (AF_INET), but it would probably be better to listen on a unix socket (AF_UNIX), or maybe use dbus.
