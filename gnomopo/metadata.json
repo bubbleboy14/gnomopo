@@ -1,0 +1,8 @@
+{
+  "name": "GNOme MOuse POsitioner",
+  "description": "Exposes mouse position",
+  "uuid": "gnomopo@mkult.co",
+  "shell-version": [
+    "46"
+  ]
+}
