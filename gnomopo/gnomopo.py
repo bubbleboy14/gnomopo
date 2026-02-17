@@ -1,4 +1,5 @@
 import os, socket
+from optparse import OptionParser
 from fyg.util import confirm, basiclog, cmd
 
 def log(*msg):
@@ -34,7 +35,15 @@ def install():
 				cmd("cp %s %s"%(fname, xpath))
 			log("great, gnomopo is almost ready - 2 more steps:")
 			log("1) restart your gnome session")
-			log("2) run gnomopo again to enable the extension")
+			log("2) run 'gnomopo install' again to enable the extension")
+
+def invoke():
+	parser = OptionParser("gnomopo [getpos|install]")
+	args = parser.parse_args()[1]
+	if args and args[0] == "install":
+		install()
+	else:
+		getpos()
 
 if __name__ == "__main__":
-	install()
+	invoke()

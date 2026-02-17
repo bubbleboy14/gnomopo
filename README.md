@@ -3,6 +3,27 @@ GNOme MOuse POsitioner is a Gnome Shell Extension that exposes the mouse positio
 
 This is intended for vanilla/default (Wayland / Gnome Mutter) Ubuntu, which doesn't seem to have an easier way AFAICT.
 
-TODO:
+## installation
+Type this:
+
+```
+pip install gnomopo
+gnomopo install
+```
+
+First, that will install the gnome extension. Then, it will instruct you to restart your gnome session (to load the extension) and run `gnomopo install` again (to enable the extension).
+
+## cli
+In addition to `gnomopo install`, you can type `gnomopo getpos` to get the mouse position.
+
+## py
+You can also call it from a python script:
+
+```
+import gnomopo
+x, y = gnomopo.getpos()
+```
+
+## todo
  - more shell versions
  - alt transports > dbus ; AF_UNIX sockets
