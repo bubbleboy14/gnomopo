@@ -2,15 +2,21 @@ import os, socket
 from optparse import OptionParser
 from fyg.util import confirm, basiclog, cmd
 
+VERBOSE = True
+def setverbosity(isverb):
+	global VERBOSE
+	VERBOSE = isverb
+
 def log(*msg):
-	basiclog("gnomopo:", *msg)
+	VERBOSE and basiclog("gnomopo:", *msg)
 
 def getpos(addr='127.0.0.1', port=62090):
 	try:
 		sock = socket.create_connection((addr, port))
-		pos = sock.recv(16)
-		log("getpos", pos)
-		return [int(v) for v in pos.decode().split(" ")]
+		pos = sock.recv(16).decode()
+		coords = [int(v) for v in pos.split(" ")]
+		log(coords)
+		return coords
 	except:
 		log("getpos failed")
 
@@ -38,12 +44,15 @@ def install():
 			log("2) run 'gnomopo install' again to enable the extension")
 
 def invoke():
-	parser = OptionParser("gnomopo [getpos|install]")
-	args = parser.parse_args()[1]
+	parser = OptionParser("gnomopo [getpos|install] -v")
+	parser.add_option("-v", "--verbose", action="store_true",
+		dest="verbose", default=False, help="log stuff")
+	ops, args = parser.parse_args()
+	setverbosity(ops.verbose)
 	if args and args[0] == "install":
 		install()
 	else:
-		getpos()
+		print(*getpos())
 
 if __name__ == "__main__":
 	invoke()
