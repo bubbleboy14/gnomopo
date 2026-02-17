@@ -49,6 +49,7 @@ def invoke():
 		dest="verbose", default=False, help="log stuff")
 	ops, args = parser.parse_args()
 	if args and args[0] == "install":
+		os.chdir(os.path.abspath(__file__).rsplit("/", 1).pop(0))
 		install()
 	else:
 		setverbosity(ops.verbose)
