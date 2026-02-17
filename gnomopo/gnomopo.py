@@ -48,10 +48,10 @@ def invoke():
 	parser.add_option("-v", "--verbose", action="store_true",
 		dest="verbose", default=False, help="log stuff")
 	ops, args = parser.parse_args()
-	setverbosity(ops.verbose)
 	if args and args[0] == "install":
 		install()
 	else:
+		setverbosity(ops.verbose)
 		print(*getpos())
 
 if __name__ == "__main__":
