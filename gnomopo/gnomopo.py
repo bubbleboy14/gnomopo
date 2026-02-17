@@ -2,7 +2,7 @@ import os, socket
 from optparse import OptionParser
 from fyg.util import confirm, basiclog, cmd
 
-VERBOSE = True
+VERBOSE = False
 def setverbosity(isverb):
 	global VERBOSE
 	VERBOSE = isverb
@@ -50,6 +50,7 @@ def invoke():
 	ops, args = parser.parse_args()
 	if args and args[0] == "install":
 		os.chdir(os.path.abspath(__file__).rsplit("/", 1).pop(0))
+		setverbosity(True) # always true for install...
 		install()
 	else:
 		setverbosity(ops.verbose)
