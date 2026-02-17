@@ -3,6 +3,8 @@ GNOme MOuse POsitioner is a Gnome Shell Extension that exposes the mouse positio
 
 This is intended for vanilla/default (Wayland / Gnome Mutter) Ubuntu, which doesn't seem to have an easier way AFAICT.
 
+v0.1
+
 ## installation
 Type this:
 
