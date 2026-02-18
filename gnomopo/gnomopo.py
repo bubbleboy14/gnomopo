@@ -10,15 +10,22 @@ def setverbosity(isverb):
 def log(*msg):
 	VERBOSE and basiclog("gnomopo:", *msg)
 
-def getpos(addr='127.0.0.1', port=62090):
+def getres(action="pos", addr="127.0.0.1", port=62090):
 	try:
 		sock = socket.create_connection((addr, port))
-		pos = sock.recv(16).decode()
-		coords = [int(v) for v in pos.split(" ")]
-		log(coords)
+		sock.write(action.encode())
+		resp = sock.recv(16).decode()
+		coords = [int(v) for v in resp.split(" ")]
+		log("getres", action, coords)
 		return coords
 	except:
-		log("getpos failed")
+		log("getres", action, "failed")
+
+def getpos(addr="127.0.0.1", port=62090):
+	return getres("pos", addr, port)
+
+def getsize(addr="127.0.0.1", port=62090):
+	return getres("size", addr, port)
 
 def install():
 	log("checking for installation...")
@@ -44,17 +51,21 @@ def install():
 			log("2) run 'gnomopo install' again to enable the extension")
 
 def invoke():
-	parser = OptionParser("gnomopo [getpos|install] -v")
+	parser = OptionParser("gnomopo [getpos|getsize|install] -v")
 	parser.add_option("-v", "--verbose", action="store_true",
 		dest="verbose", default=False, help="log stuff")
 	ops, args = parser.parse_args()
-	if args and args[0] == "install":
+	action = args and args[0]
+	if action == "install":
 		os.chdir(os.path.abspath(__file__).rsplit("/", 1).pop(0))
 		setverbosity(True) # always true for install...
 		install()
 	else:
 		setverbosity(ops.verbose)
-		print(*getpos())
+		if action == "getpos":
+			print(*getpos())
+		elif action == "getsize":
+			print(*getsize())
 
 if __name__ == "__main__":
 	invoke()
