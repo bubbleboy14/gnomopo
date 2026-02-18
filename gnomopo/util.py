@@ -12,7 +12,7 @@ def log(*msg):
 def getres(action="mpos", addr="127.0.0.1", port=62090):
 	try:
 		sock = socket.create_connection((addr, port))
-		sock.write(action.encode())
+		sock.write(("%s\n"%(action,)).encode())
 		resp = sock.recv(16).decode()
 		coords = [int(v) for v in resp.split(" ")]
 		log("getres", action, coords)
