@@ -1,25 +1,8 @@
-import os, socket
+import os
 from optparse import OptionParser
-from fyg.util import confirm, basiclog, cmd
-
-VERBOSE = False
-def setverbosity(isverb):
-	global VERBOSE
-	VERBOSE = isverb
-
-def log(*msg):
-	VERBOSE and basiclog("gnomopo:", *msg)
-
-def getres(action="pos", addr="127.0.0.1", port=62090):
-	try:
-		sock = socket.create_connection((addr, port))
-		sock.write(action.encode())
-		resp = sock.recv(16).decode()
-		coords = [int(v) for v in resp.split(" ")]
-		log("getres", action, coords)
-		return coords
-	except:
-		log("getres", action, "failed")
+from fyg.util import confirm, cmd
+from .util import setverbosity, log, getres
+from .installer import Installer
 
 def getpos(addr="127.0.0.1", port=62090):
 	return getres("pos", addr, port)
@@ -27,41 +10,17 @@ def getpos(addr="127.0.0.1", port=62090):
 def getsize(addr="127.0.0.1", port=62090):
 	return getres("size", addr, port)
 
-def install():
-	log("checking for installation...")
-	fpath = "~/.local/share/gnome-shell/extensions"
-	ename = "gnomopo@mkult.co"
-	xpath = "%s/%s"%(fpath, ename)
-	epath = "%s/extension.js"%(xpath,)
-	if os.path.exists(epath):
-		log("found", epath)
-		if confirm("enable extension?"):
-			cmd("gnome-extensions enable %s"%(ename,))
-		log("great, you're probably good to go!")
-	else:
-		log("can't find", epath)
-		if confirm("install extension"):
-			if not os.path.exists(xpath):
-				log("building", xpath)
-				cmd("mkdir -p %s"%(xpath,))
-			for fname in ["extension.js", "metadata.json"]:
-				cmd("cp %s %s"%(fname, xpath))
-			log("great, gnomopo is almost ready - 2 more steps:")
-			log("1) restart your gnome session")
-			log("2) run 'gnomopo install' again to enable the extension")
-
 def invoke():
-	parser = OptionParser("gnomopo [getpos|getsize|install] -v")
+	parser = OptionParser("gnomopo [getpos|getsize|install|reinstall|uninstall] -v")
 	parser.add_option("-v", "--verbose", action="store_true",
 		dest="verbose", default=False, help="log stuff")
 	ops, args = parser.parse_args()
 	action = args and args[0]
-	if action == "install":
+	setverbosity(ops.verbose)
+	if action.endswith("install"):
 		os.chdir(os.path.abspath(__file__).rsplit("/", 1).pop(0))
-		setverbosity(True) # always true for install...
-		install()
+		Installer().run(action)
 	else:
-		setverbosity(ops.verbose)
 		if action == "getpos":
 			print(*getpos())
 		elif action == "getsize":
