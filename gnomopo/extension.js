@@ -39,7 +39,6 @@ export default class GnomopoExtension extends Extension {
                     return;
                 }
                 const action = line.toString().trim();
-                log("processing " + action);
                 let resp, x, y, primon, geo;
                 if (action == "mpos")
                     [x, y] = global.get_pointer();

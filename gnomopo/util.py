@@ -12,11 +12,11 @@ def log(*msg):
 def getres(action="mpos", addr="127.0.0.1", port=62090):
 	try:
 		sock = socket.create_connection((addr, port))
-		sock.write(("%s\n"%(action,)).encode())
+		sock.send(action.encode() + b"\n")
 		resp = sock.recv(16).decode()
 		coords = [int(v) for v in resp.split(" ")]
 		log("getres", action, coords)
 		return coords
-	except:
-		log("getres", action, "failed")
+	except Exception as e:
+		log("getres", action, "failed:", e)
 
