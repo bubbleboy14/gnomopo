@@ -1,5 +1,5 @@
 import os
-from fyg.util import cmd, confirm, Named
+from fyg.util import cmd, output, confirm, Named
 
 class Installer(Named):
 	def __init__(self):
@@ -32,12 +32,20 @@ class Installer(Named):
 			return self.log("uninstall declined")
 		cmd("rm -rf %s"%(self.xpath,))
 
+	def enabled(self):
+		info = output("gnome-extensions info %s"%(self.name,), loud=True)
+		return "Enabled: Yes" in info
+
 	def enable(self):
+		if self.enabled():
+			return self.log("already enabled!")
 		if not confirm("enable extension"):
 			return self.log("enable declined")
 		cmd("gnome-extensions enable %s"%(self.name,))
 
 	def disable(self):
+		if not self.enabled():
+			return self.log("already disabled!")
 		if not confirm("disable extension"):
 			return self.log("disable declined")
 		cmd("gnome-extensions disable %s"%(self.name,))
