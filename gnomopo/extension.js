@@ -23,16 +23,17 @@ const port = 62090,
     socket_address = Gio.InetSocketAddress.new_from_string('127.0.0.1', port);
 
 const log = function(msg) {
-	console.debug("gnomopo: " + msg);
+	console.log("gnomopo: " + msg);
 };
 
 export default class GnomopoExtension extends Extension {
     onconnection(socket_service, connection, channel) {
         const istream = connection.get_input_stream(),
-            ibytes = istream.read_bytes(16, null).get_data(),
+            ibytes = istream.read_bytes(4, null).get_data(),
             action = String.fromCharCode.apply(null, ibytes);
+        log("processing " + action);
         let resp, x, y, primon, geo;
-        if (action == "pos")
+        if (action == "mpos")
             [x, y] = global.get_pointer();
         else if (action == "size") { // size
             primon = global.display.get_primary_monitor();
@@ -48,23 +49,20 @@ export default class GnomopoExtension extends Extension {
         connection.close(null);
     }
 
-    getservice() {
-        if (!this._service) {
-            this._service = new Gio.SocketService();
-            this._service.add_address(socket_address, Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT, null);
-            this._service.connect('incoming', this.onconnection);
-            log("initialized service on port " + port);
-        }
-        return this._service;
-    }
-
     enable() {
-        log("starting")
-        this.getservice().start();
+        this._service = new Gio.SocketService();
+        this._service.add_address(socket_address, Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT, null);
+        this._service.connect('incoming', this.onconnection.bind(this));
+        this._service.start();
+        log("enabled on port " + port)
     }
 
     disable() {
-        log("stopping")
-        this.getservice().close();
+        if (this._service) {
+            this._service.stop();
+            this._service.close();
+            this._service = null;
+        }
+        log("disabled")
     }
 }

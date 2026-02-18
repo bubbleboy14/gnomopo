@@ -5,7 +5,7 @@ from .util import setverbosity, log, getres
 from .installer import Installer
 
 def getpos(addr="127.0.0.1", port=62090):
-	return getres("pos", addr, port)
+	return getres("mpos", addr, port)
 
 def getsize(addr="127.0.0.1", port=62090):
 	return getres("size", addr, port)
