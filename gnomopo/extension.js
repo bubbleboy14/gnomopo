@@ -29,9 +29,12 @@ const log = function(msg) {
 export default class GnomopoExtension extends Extension {
     onconnection(socket_service, connection, channel) {
         const istream = connection.get_input_stream(),
-            ibytes = istream.read_bytes(4, null).get_data(),
-            action = String.fromCharCode.apply(null, [ibytes]);
-        log("processing " + ibytes + " -> " + action);
+//            ibytes = istream.read_bytes(4, null).get_data(),
+//            action = String.fromCharCode.apply(null, [ibytes]);
+            datastream = new Gio.DataInputStream({ base_stream: istream }),
+            action = datastream.read_line(null)[0];
+
+        log("processing " + action);
         let resp, x, y, primon, geo;
         if (action == "mpos")
             [x, y] = global.get_pointer();
