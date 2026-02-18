@@ -31,7 +31,7 @@ export default class GnomopoExtension extends Extension {
         const istream = connection.get_input_stream(),
             ibytes = istream.read_bytes(4, null).get_data(),
             action = String.fromCharCode.apply(null, [ibytes]);
-        log("processing " + action);
+        log("processing " + ibytes + " -> " + action);
         let resp, x, y, primon, geo;
         if (action == "mpos")
             [x, y] = global.get_pointer();
