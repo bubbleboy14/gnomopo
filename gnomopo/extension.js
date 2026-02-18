@@ -26,12 +26,25 @@ const log = function(msg) {
 	console.debug("gnomopo: " + msg);
 };
 
-export default class PlainExampleExtension extends Extension {
+export default class GnomopoExtension extends Extension {
     onconnection(socket_service, connection, channel) {
-        const [x, y] = global.get_pointer(),
-            pos = x + " " + y;
-        log("mouse at " + pos);
-        connection.get_output_stream().write_bytes(new GLib.Bytes(pos), null);
+        const istream = connection.get_input_stream(),
+            ibytes = istream.read_bytes(16, null).get_data(),
+            action = String.fromCharCode.apply(null, ibytes);
+        let resp, x, y, primon, geo;
+        if (action == "pos")
+            [x, y] = global.get_pointer();
+        else if (action == "size") { // size
+            primon = global.display.get_primary_monitor();
+            geo = global.display.get_monitor_geometry(primon);
+            x = geo.width;
+            y = geo.height;
+        } else
+            resp = "illegal action";
+        if (!resp)
+            resp = x + " " + y;
+        log(action + " " + resp);
+        connection.get_output_stream().write_bytes(new GLib.Bytes(resp), null);
         connection.close(null);
     }
 
