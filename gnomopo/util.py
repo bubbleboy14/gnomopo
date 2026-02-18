@@ -9,7 +9,7 @@ def setverbosity(isverb):
 def log(*msg):
 	VERBOSE and basiclog("gnomopo:", *msg)
 
-def getres(action="pos", addr="127.0.0.1", port=62090):
+def getres(action="mpos", addr="127.0.0.1", port=62090):
 	try:
 		sock = socket.create_connection((addr, port))
 		sock.write(action.encode())
