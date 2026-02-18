@@ -28,28 +28,39 @@ const log = function(msg) {
 
 export default class GnomopoExtension extends Extension {
     onconnection(socket_service, connection, channel) {
-        const istream = connection.get_input_stream(),
-//            ibytes = istream.read_bytes(4, null).get_data(),
-//            action = String.fromCharCode.apply(null, [ibytes]);
-            datastream = new Gio.DataInputStream({ base_stream: istream }),
-            action = datastream.read_line()[0];
-
-        log("processing " + action);
-        let resp, x, y, primon, geo;
-        if (action == "mpos")
-            [x, y] = global.get_pointer();
-        else if (action == "size") { // size
-            primon = global.display.get_primary_monitor();
-            geo = global.display.get_monitor_geometry(primon);
-            x = geo.width;
-            y = geo.height;
-        } else
-            resp = "illegal action";
-        if (!resp)
-            resp = x + " " + y;
-        log(action + " " + resp);
-        connection.get_output_stream().write_bytes(new GLib.Bytes(resp), null);
-        connection.close(null);
+        const datastream = new Gio.DataInputStream({
+            base_stream: connection.get_input_stream()
+        });
+        datastream.read_line_async(GLib.PRIORITY_DEFAULT, null, (stream, res) => {
+            try {
+                const [line, length] = stream.read_line_finish(res);
+                if (line === null) {
+                    connection.close(null);
+                    return;
+                }
+                const action = line.toString().trim();
+                log("processing " + action);
+                let resp, x, y, primon, geo;
+                if (action == "mpos")
+                    [x, y] = global.get_pointer();
+                else if (action == "size") { // size
+                    primon = global.display.get_primary_monitor();
+                    geo = global.display.get_monitor_geometry(primon);
+                    x = geo.width;
+                    y = geo.height;
+                } else
+                    resp = "illegal action";
+                if (!resp)
+                    resp = x + " " + y;
+                log(action + " " + resp);
+                connection.get_output_stream().write_bytes(new GLib.Bytes(resp), null);
+            } catch (e) {
+                log("error: " + e.message);
+            } finally {
+                connection.close(null);
+            }
+        });
+        return true;
     }
 
     enable() {
