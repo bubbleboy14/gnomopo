@@ -26,6 +26,12 @@ const log = function(msg) {
 	console.log("gnomopo: " + msg);
 };
 
+const rectify = function(rect) {
+    return {
+        x: rect.x, y: rect.y, width: rect.width, height: rect.height
+    };
+};
+
 export default class GnomopoExtension extends Extension {
     onconnection(socket_service, connection, channel) {
         const datastream = new Gio.DataInputStream({
@@ -39,18 +45,25 @@ export default class GnomopoExtension extends Extension {
                     return;
                 }
                 const action = line.toString().trim();
-                let resp, x, y, primon, geo;
+                let coords, resp, primon, geo, frect, brect;
                 if (action == "mpos")
-                    [x, y] = global.get_pointer();
-                else if (action == "size") { // size
+                    coords = global.get_pointer();
+                else if (action == "size") {
                     primon = global.display.get_primary_monitor();
                     geo = global.display.get_monitor_geometry(primon);
-                    x = geo.width;
-                    y = geo.height;
-                } else
+                    coords = [geo.width, geo.height, primon.geometry_scale || 1];
+                } else if (action == "window") {
+                    frect = global.display.get_focus_window().get_frame_rect();
+                    brect = global.display.get_focus_window().get_buffer_rect();
+                    resp = JSON.stringify({
+                        "frame": rectify(frect),
+                        "buffer": rectify(brect)
+                    });
+                }
+                else
                     resp = "illegal action";
                 if (!resp)
-                    resp = x + " " + y;
+                    resp = coords.join(" ");
                 log(action + " " + resp);
                 connection.get_output_stream().write_bytes(new GLib.Bytes(resp), null);
             } catch (e) {
