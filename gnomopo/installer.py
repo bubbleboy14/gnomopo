@@ -3,7 +3,7 @@ from fyg.util import cmd, output, confirm, Named
 
 class Installer(Named):
 	def __init__(self):
-		self.path = "~/.local/share/gnome-shell/extensions"
+		self.path = os.path.expanduser("~/.local/share/gnome-shell/extensions")
 		self.name = "gnomopo@mkult.co"
 		self.xpath = "%s/%s"%(self.path, self.name)
 		self.epath = "%s/extension.js"%(self.xpath,)
@@ -50,11 +50,22 @@ class Installer(Named):
 			return self.log("disable declined")
 		cmd("gnome-extensions disable %s"%(self.name,))
 
+	def status(self):
+		if self.installed():
+			enabled = self.enabled()
+			self.log("enabled:", enabled)
+			current = not output("diff extension.js %s"%(self.epath,), loud=True)
+			self.log("current:", current)
+			current or self.log('type "gnomopo reinstall" to update the extension')
+			enabled or self.log('type "gnomopo enable" to enable the extension')
+
 	def run(self, action="install"):
 		self.log("run", action)
-		if action.endswith("able"):
+		if action == "status":
+			self.status()
+		elif action.endswith("able"):
 			getattr(self, action)()
-		else:
+		else: # install, uninstall, reinstall
 			if action in ["uninstall", "reinstall"]:
 				self.uninstall()
 			if action != "uninstall":
