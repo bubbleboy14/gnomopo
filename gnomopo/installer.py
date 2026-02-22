@@ -58,6 +58,8 @@ class Installer(Named):
 			self.log("current:", current)
 			current or self.log('type "gnomopo reinstall" to update the extension')
 			enabled or self.log('type "gnomopo enable" to enable the extension')
+		else:
+			self.log('type "gnomopo install" to install the extension')
 
 	def run(self, action="install"):
 		self.log("run", action)
