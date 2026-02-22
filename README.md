@@ -3,7 +3,7 @@ GNOme MOuse POsitioner is a Gnome Shell Extension that exposes a few things like
 
 This is intended for vanilla/default (Wayland / Gnome Mutter) Ubuntu, which doesn't seem to have an easier way to do this stuff AFAICT.
 
-v0.1.1
+v0.1.2
 
 ## installation
 Type this:
