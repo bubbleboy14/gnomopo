@@ -2,7 +2,7 @@ import socket, json, atexit
 from fyg.util import basiclog
 
 SOCK = None
-VERBOSE = True
+VERBOSE = False
 def setverbosity(isverb):
 	global VERBOSE
 	VERBOSE = isverb
@@ -22,14 +22,23 @@ def closesock():
 	if SOCK:
 		log("disconnecting")
 		SOCK.close()
+		SOCK = None
+
+def send(msg, addr="127.0.0.1", port=62090):
+	dosend = lambda : getsock(addr, port).send(msg.encode() + b"\n")
+	try:
+		dosend()
+	except:
+		log("send error - reconnecting")
+		closesock()
+		dosend()
 
 atexit.register(closesock)
 
 def getres(action="mpos", addr="127.0.0.1", port=62090):
 	try:
-		sock = getsock(addr, port)
-		sock.send(action.encode() + b"\n")
-		resp = sock.recv(128).decode()
+		send(action, addr, port)
+		resp = getsock(addr, port).recv(128).decode()
 		if action == "window":
 			coords = json.loads(resp)
 		else:
