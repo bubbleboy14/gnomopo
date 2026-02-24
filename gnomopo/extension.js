@@ -61,6 +61,9 @@ class Gnomopo {
 
 class GnoConn {
     close(err) {
+        if (this.closed)
+            return log("already closed")
+        this.closed = true;
         this.connection.close(null);
         if (err)
             log("closed with error: " + err);
@@ -76,7 +79,7 @@ class GnoConn {
             log("timed out");
             return this.close.call(this, "timeout");
         }
-        return true;
+        return !this.closed;
     }
 
     read(stream, res) {
@@ -101,6 +104,7 @@ class GnoConn {
     manage(connection, proc) {
         log("opened");
         this.proc = proc;
+        this.closed = false;
         this.ts = Date.now();
         this.connection = connection;
         this.datastream = new Gio.DataInputStream({
@@ -128,6 +132,8 @@ export default class GnomopoExtension extends Extension {
         }
         for (connid of closed)
             delete this._conns[connid];
+        if (closed.length)
+            log("cleaned up " + closed.length + " connections");
         return true;
     }
 
