@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='gnomopo',
-    version="0.1.3",
+    version="0.1.3.1",
     author='Mario Balibrera',
     author_email='mario.balibrera@gmail.com',
     license='GPL-2.0-or-later',
