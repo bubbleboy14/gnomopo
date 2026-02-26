@@ -75,7 +75,7 @@ class GnoConn {
     }
 
     check(now) {
-        if (now - this.ts > 60000) {
+        if (now - this.ts > 300000) {
             log("timed out");
             return this.close.call(this, "timeout");
         }
